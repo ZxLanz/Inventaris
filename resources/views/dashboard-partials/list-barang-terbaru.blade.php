@@ -11,7 +11,7 @@
             <tr>
                 <td>{{ $barang->nama_barang }}</td>
                 <td>{{ $barang->lokasi->nama_lokasi }}</td>
-                <td>{{ date('d-m-Y', strtotime($barang->tanggal_pengadaan)) }}</td>
+                <td>{{ date('d-m-Y', strtotime($barang->created_at)) }}</td>
             </tr>
         @empty
             <tr>

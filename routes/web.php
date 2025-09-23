@@ -12,28 +12,24 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::middleware('auth')->group(function () {
-    // Dashboard
-    Route::get('/dashboard', [DashboardController::class, 'index'])
-        ->middleware(['auth', 'verified'])
-        ->name('dashboard');
+Route::get('/dashboard', [DashboardController::class, 'index'])
+    ->middleware(['auth', 'verified'])
+    ->name('dashboard');
 
+Route::middleware('auth')->group(function () {
     // Profile routes
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+    // Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
-    // Barang routes
+    // Barang laporan route (harus sebelum resource)
+    Route::get('/barang/laporan', [BarangController::class, 'cetakLaporan'])->name('barang.laporan');
+    
+    // Resource routes
+    Route::resource('user', UserController::class);
+    Route::resource('kategori', KategoriController::class);
+    Route::resource('lokasi', LokasiController::class);
     Route::resource('barang', BarangController::class);
-
-    // Kategori routes (hanya admin yang bisa manage)
-    Route::resource('kategori', KategoriController::class)->middleware('role:admin');
-
-    // Lokasi routes (hanya admin yang bisa manage)
-    Route::resource('lokasi', LokasiController::class)->middleware('role:admin');
-
-    // User management routes (hanya admin yang bisa manage)
-    Route::resource('user', UserController::class)->middleware('role:admin');
 });
 
 require __DIR__.'/auth.php';
