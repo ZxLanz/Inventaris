@@ -29,6 +29,7 @@ return new class extends Migration
             $table->integer('jumlah')->default(0);
             $table->string('satuan', 20);
             $table->enum('kondisi', ['Baik', 'Rusak Ringan', 'Rusak Berat'])->default('Baik');
+            $table->date('tanggal_pengadaan'); // TAMBAHKAN BARIS INI
             $table->text('keterangan')->nullable();
             $table->string('gambar')->nullable();
             $table->timestamps();

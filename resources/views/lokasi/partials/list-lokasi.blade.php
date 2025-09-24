@@ -2,22 +2,22 @@
     <x-slot name="header">
         <tr>
             <th>#</th>
-            <th>Nama Kategori</th>
-            @can('manage kategori')
+            <th>Nama Lokasi</th>
+            @can('manage lokasi')
                 <th>Aksi</th>
             @endcan
         </tr>
     </x-slot>
 
-    @forelse ($kategoris as $index => $kategori)
+    @forelse ($lokasis as $index => $lokasi)
         <tr>
-            <td>{{ $kategoris->firstItem() + $index }}</td>
-            <td>{{ $kategori->nama_kategori }}</td>
-            @can('manage kategori')
+            <td>{{ $lokasis->firstItem() + $index }}</td>
+            <td>{{ $lokasi->nama_lokasi }}</td>
+            @can('manage lokasi')
                 <td>
                     <div class="btn-group btn-group-sm" role="group">
                         <!-- Edit -->
-                        <x-tombol-aksi :href="route('kategori.edit', $kategori->id)" type="edit" />
+                        <x-tombol-aksi :href="route('lokasi.edit', $lokasi->id)" type="edit" />
 
                         <!-- Delete pakai modal -->
                         <button 
@@ -25,7 +25,7 @@
                             class="btn btn-danger btn-sm"
                             data-bs-toggle="modal"
                             data-bs-target="#deleteModal"
-                            data-url="{{ route('kategori.destroy', $kategori->id) }}"
+                            data-url="{{ route('lokasi.destroy', $lokasi->id) }}"
                         >
                             Hapus
                         </button>
@@ -35,9 +35,13 @@
         </tr>
     @empty
         <tr>
-            <td colspan="3" class="text-center">
-                <div class="alert alert-danger">
-                    Data kategori belum tersedia.
+            @can('manage lokasi')
+                <td colspan="3" class="text-center">
+            @else
+                <td colspan="2" class="text-center">
+            @endcan
+                <div class="alert alert-warning">
+                    Data lokasi belum tersedia.
                 </div>
             </td>
         </tr>

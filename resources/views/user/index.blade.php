@@ -19,13 +19,13 @@
             @endif
         </div>
 
-        <!-- Tabel tanpa padding -->
+        <!-- Tabel tanpa padding dan border -->
         <div class="table-responsive">
             @include('user.partials.list-user')
         </div>
         
-        <!-- Pagination dengan border atas -->
-        <div class="card-body border-top">
+        <!-- Pagination tanpa border atas -->
+        <div class="card-body">
             {{ $users->links() }}
         </div>
     </div>
