@@ -3,11 +3,17 @@
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\BarangController;
+<<<<<<< HEAD
 use App\Http\Controllers\BarangAssetController;
 use App\Http\Controllers\KategoriController;
 use App\Http\Controllers\LokasiController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\PeminjamanController;
+=======
+use App\Http\Controllers\KategoriController;
+use App\Http\Controllers\LokasiController;
+use App\Http\Controllers\UserController;
+>>>>>>> 7128ee3caecc07cd0adb1d836df3fe5b20ca7d83
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -27,6 +33,7 @@ Route::middleware('auth')->group(function () {
     // Barang laporan route (harus sebelum resource)
     Route::get('/barang/laporan', [BarangController::class, 'cetakLaporan'])->name('barang.laporan');
     
+<<<<<<< HEAD
     // BarangAsset routes (untuk hapus & update status individual asset)
     Route::delete('/barang-asset/{barangAsset}', [BarangAssetController::class, 'destroy'])
         ->name('barang-asset.destroy');
@@ -51,12 +58,20 @@ Route::middleware('auth')->group(function () {
     // API untuk fetch assets
     Route::get('/api/peminjaman/get-assets', [PeminjamanController::class, 'getAssetsByBarang'])->name('peminjaman.getAssets');
     
+=======
+>>>>>>> 7128ee3caecc07cd0adb1d836df3fe5b20ca7d83
     // Resource routes
     Route::resource('user', UserController::class);
     Route::resource('kategori', KategoriController::class);
     Route::resource('lokasi', LokasiController::class);
     Route::resource('barang', BarangController::class);
+<<<<<<< HEAD
     Route::resource('peminjaman', PeminjamanController::class)->except(['edit', 'update', 'destroy']);
 });
 
 require __DIR__.'/auth.php';
+=======
+});
+
+require __DIR__.'/auth.php';
+>>>>>>> 7128ee3caecc07cd0adb1d836df3fe5b20ca7d83

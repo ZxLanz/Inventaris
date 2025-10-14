@@ -3,14 +3,21 @@
 namespace App\Http\Controllers;
 
 use App\Models\Barang;
+<<<<<<< HEAD
 use App\Models\BarangAsset;
+=======
+>>>>>>> 7128ee3caecc07cd0adb1d836df3fe5b20ca7d83
 use App\Models\Kategori;
 use App\Models\Lokasi;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
 use Illuminate\Support\Facades\Log;
+<<<<<<< HEAD
 use Illuminate\Support\Facades\DB;
+=======
+use Illuminate\Support\Facades\Storage;
+>>>>>>> 7128ee3caecc07cd0adb1d836df3fe5b20ca7d83
 use Barryvdh\DomPDF\Facade\Pdf;
 
 class BarangController extends Controller implements HasMiddleware
@@ -26,11 +33,18 @@ class BarangController extends Controller implements HasMiddleware
     {
         $search = $request->search;
         
+<<<<<<< HEAD
         $barangs = Barang::with(['kategori', 'lokasi', 'assets'])
             ->when($search, function ($query, $search) {
                 $query->where('nama_barang', 'like', '%' . $search . '%')
                       ->orWhere('kode_barang', 'like', '%' . $search . '%')
                       ->orWhere('prefix', 'like', '%' . $search . '%');
+=======
+        $barangs = Barang::with(['kategori', 'lokasi'])
+            ->when($search, function ($query, $search) {
+                $query->where('nama_barang', 'like', '%' . $search . '%')
+                      ->orWhere('kode_barang', 'like', '%' . $search . '%');
+>>>>>>> 7128ee3caecc07cd0adb1d836df3fe5b20ca7d83
             })
             ->latest()->paginate(15)->withQueryString();
         
@@ -47,6 +61,7 @@ class BarangController extends Controller implements HasMiddleware
 
     public function store(Request $request)
     {
+<<<<<<< HEAD
         // Validasi sesuai jenis barang
         $rules = [
             'jenis' => 'required|in:asset,consumable',
@@ -138,11 +153,47 @@ class BarangController extends Controller implements HasMiddleware
             return back()->withErrors(['error' => 'Gagal menambahkan barang: ' . $e->getMessage()])
                         ->withInput();
         }
+=======
+        $validated = $request->validate([
+            'kode_barang' => 'required|string|max:50|unique:barangs,kode_barang',
+            'nama_barang' => 'required|string|max:150',
+            'kategori_id' => 'required|exists:kategoris,id',
+            'lokasi_id' => 'required|exists:lokasis,id',
+            'jumlah' => 'required|integer|min:0',
+            'satuan' => 'required|string|max:20',
+            'kondisi' => 'required|in:Baik,Rusak Ringan,Rusak Berat',
+            'tanggal_pengadaan' => 'required|date',
+            'gambar' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+        ]);
+
+        if ($request->hasFile('gambar')) {
+            $file = $request->file('gambar');
+            $filename = time() . '_' . $file->getClientOriginalName();
+            
+            // Pastikan folder exists
+            $uploadPath = public_path('gambar-barang');
+            if (!file_exists($uploadPath)) {
+                mkdir($uploadPath, 0755, true);
+            }
+            
+            $file->move($uploadPath, $filename);
+            $validated['gambar'] = $filename;
+        }
+
+        Barang::create($validated);
+
+        return redirect()->route('barang.index')
+                        ->with('success', 'Data barang berhasil ditambahkan.');
+>>>>>>> 7128ee3caecc07cd0adb1d836df3fe5b20ca7d83
     }
 
     public function show(Barang $barang)
     {
+<<<<<<< HEAD
         $barang->load(['kategori', 'lokasi', 'assets.lokasi']);
+=======
+        $barang->load(['kategori', 'lokasi']);
+>>>>>>> 7128ee3caecc07cd0adb1d836df3fe5b20ca7d83
         return view('barang.show', compact('barang'));
     }
 
@@ -156,6 +207,7 @@ class BarangController extends Controller implements HasMiddleware
 
     public function update(Request $request, Barang $barang)
     {
+<<<<<<< HEAD
         // Validasi sesuai jenis
         $rules = [
             'nama_barang' => 'required|string|max:150',
@@ -271,6 +323,48 @@ class BarangController extends Controller implements HasMiddleware
         }
     }
 
+=======
+        $validated = $request->validate([
+            'kode_barang' => 'required|string|max:50|unique:barangs,kode_barang,' . $barang->id,
+            'nama_barang' => 'required|string|max:150',
+            'kategori_id' => 'required|exists:kategoris,id',
+            'lokasi_id' => 'required|exists:lokasis,id',
+            'jumlah' => 'required|integer|min:0',
+            'satuan' => 'required|string|max:20',
+            'kondisi' => 'required|in:Baik,Rusak Ringan,Rusak Berat',
+            'tanggal_pengadaan' => 'required|date',
+            'gambar' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+        ]);
+
+        if ($request->hasFile('gambar')) {
+            // Hapus gambar lama jika ada
+            if ($barang->gambar && file_exists(public_path('gambar-barang/' . $barang->gambar))) {
+                unlink(public_path('gambar-barang/' . $barang->gambar));
+            }
+            
+            $file = $request->file('gambar');
+            $filename = time() . '_' . $file->getClientOriginalName();
+            
+            // Pastikan folder exists
+            $uploadPath = public_path('gambar-barang');
+            if (!file_exists($uploadPath)) {
+                mkdir($uploadPath, 0755, true);
+            }
+            
+            $file->move($uploadPath, $filename);
+            $validated['gambar'] = $filename;
+        }
+
+        $barang->update($validated);
+
+        return redirect()->route('barang.index')
+                        ->with('success', 'Data barang berhasil diperbarui.');
+    }
+
+    /**
+     * Method untuk cetak laporan PDF
+     */
+>>>>>>> 7128ee3caecc07cd0adb1d836df3fe5b20ca7d83
     public function cetakLaporan()
     {
         $barangs = Barang::with(['kategori', 'lokasi'])->get();
@@ -286,11 +380,18 @@ class BarangController extends Controller implements HasMiddleware
         return $pdf->stream('Laporan-Inventaris-barang.pdf');
     }
 
+<<<<<<< HEAD
+=======
+    /**
+     * PERBAIKAN UTAMA: Fungsi destroy yang diperbaiki
+     */
+>>>>>>> 7128ee3caecc07cd0adb1d836df3fe5b20ca7d83
     public function destroy(Barang $barang)
     {
         try {
             Log::info('Attempting to delete barang', [
                 'id' => $barang->id,
+<<<<<<< HEAD
                 'nama_barang' => $barang->nama_barang,
                 'jenis' => $barang->jenis
             ]);
@@ -331,6 +432,11 @@ class BarangController extends Controller implements HasMiddleware
                 $barang->assets()->delete();
             }
             
+=======
+                'nama_barang' => $barang->nama_barang
+            ]);
+            
+>>>>>>> 7128ee3caecc07cd0adb1d836df3fe5b20ca7d83
             // Hapus gambar jika ada
             if ($barang->gambar) {
                 $imagePath = public_path('gambar-barang/' . $barang->gambar);
@@ -340,6 +446,7 @@ class BarangController extends Controller implements HasMiddleware
                 }
             }
 
+<<<<<<< HEAD
             $barang->delete();
             
             DB::commit();
@@ -352,6 +459,17 @@ class BarangController extends Controller implements HasMiddleware
         } catch (\Exception $e) {
             DB::rollBack();
             
+=======
+            // Hapus data dari database
+            $barang->delete();
+            
+            Log::info('Successfully deleted barang with ID: ' . $barang->id);
+
+            return redirect()->route('barang.index')
+                            ->with('success', 'Data barang berhasil dihapus.');
+                            
+        } catch (\Exception $e) {
+>>>>>>> 7128ee3caecc07cd0adb1d836df3fe5b20ca7d83
             Log::error('Error deleting barang', [
                 'id' => $barang->id ?? 'unknown',
                 'error' => $e->getMessage(),
@@ -359,7 +477,11 @@ class BarangController extends Controller implements HasMiddleware
             ]);
             
             return redirect()->route('barang.index')
+<<<<<<< HEAD
                 ->with('error', 'Gagal menghapus data barang: ' . $e->getMessage());
+=======
+                            ->with('error', 'Gagal menghapus data barang: ' . $e->getMessage());
+>>>>>>> 7128ee3caecc07cd0adb1d836df3fe5b20ca7d83
         }
     }
 }

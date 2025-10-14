@@ -13,6 +13,7 @@
 
         <!-- Menu -->
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
+<<<<<<< HEAD
             <!-- Left Side -->
             <ul class="navbar-nav me-auto">
                 @php
@@ -62,6 +63,42 @@
                 @endforeach
             </ul>
             
+=======
+          <!-- Left Side -->
+<ul class="navbar-nav me-auto">
+    @php
+    $navs = [
+        ['route' => 'dashboard', 'name' => 'Dashboard'],
+        ['route' => 'barang.index', 'name' => 'Barang'],
+        ['route' => 'lokasi.index', 'name' => 'Lokasi'],
+        ['route' => 'kategori.index', 'name' => 'Kategori'],
+        ['route' => 'user.index', 'name' => 'User', 'role' => 'admin'], // users.index!
+    ];
+    @endphp
+
+    @foreach ($navs as $nav)
+        @php
+        $isActive = request()->routeIs($nav['route']);
+        @endphp
+
+        @if (isset($nav['role']))
+            @role($nav['role'])
+            <li class="nav-item">
+                <a class="nav-link {{ $isActive ? 'active' : '' }}" href="{{ route($nav['route']) }}">
+                    {{ __($nav['name']) }}
+                </a>
+            </li>
+            @endrole
+        @else
+            <li class="nav-item">
+                <a class="nav-link {{ $isActive ? 'active' : '' }}" href="{{ route($nav['route']) }}">
+                    {{ __($nav['name']) }}
+                </a>
+            </li>
+        @endif
+    @endforeach
+</ul>
+>>>>>>> 7128ee3caecc07cd0adb1d836df3fe5b20ca7d83
             <!-- Right Side -->
             <ul class="navbar-nav ms-auto">
                 <!-- Dropdown User -->
