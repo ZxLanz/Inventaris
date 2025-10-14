@@ -23,7 +23,7 @@ class Peminjaman extends Model
         'total_denda' => 'decimal:2',
     ];
 
-    // ========== RELASI YANG SUDAH ADA ========== 
+    // === RELASI YANG SUDAH ADA === 
     
     public function barang(): BelongsTo
     {
@@ -40,7 +40,7 @@ class Peminjaman extends Model
         return $this->belongsTo(User::class, 'approved_by');
     }
 
-    // ========== 🆕 RELASI BARU - TAMBAHKAN INI ========== 
+    // === 🆕 RELASI BARU - TAMBAHKAN INI === 
     
     /**
      * Relationship: Peminjaman belongs to BarangAsset (untuk asset)
@@ -50,7 +50,7 @@ class Peminjaman extends Model
         return $this->belongsTo(BarangAsset::class, 'barang_asset_id');
     }
 
-    // ========== ACCESSOR & SCOPE (TETAP SAMA) ========== 
+    // === ACCESSOR & SCOPE (TETAP SAMA) === 
     
     public function getHariTerlambatAttribute(): int
     {

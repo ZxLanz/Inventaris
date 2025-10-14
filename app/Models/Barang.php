@@ -5,10 +5,10 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-<<<<<<< HEAD
+
 use Illuminate\Database\Eloquent\Relations\HasMany;
-=======
->>>>>>> 7128ee3caecc07cd0adb1d836df3fe5b20ca7d83
+
+
 
 class Barang extends Model
 {
@@ -20,28 +20,28 @@ class Barang extends Model
         'tanggal_pengadaan' => 'date',
     ];
 
-<<<<<<< HEAD
+
     /**
      * Relationship: Barang belongs to Kategori
      */
-=======
->>>>>>> 7128ee3caecc07cd0adb1d836df3fe5b20ca7d83
+
+
     public function kategori(): BelongsTo
     {
         return $this->belongsTo(Kategori::class, 'kategori_id');
     }
 
-<<<<<<< HEAD
+
     /**
      * Relationship: Barang belongs to Lokasi
      */
-=======
->>>>>>> 7128ee3caecc07cd0adb1d836df3fe5b20ca7d83
+
+
     public function lokasi(): BelongsTo
     {
         return $this->belongsTo(Lokasi::class, 'lokasi_id');
     }
-<<<<<<< HEAD
+
 
     /**
      * Relationship: Barang has many Peminjaman
@@ -201,6 +201,6 @@ class Barang extends Model
         
         return collect();
     }
-=======
->>>>>>> 7128ee3caecc07cd0adb1d836df3fe5b20ca7d83
+
+
 }

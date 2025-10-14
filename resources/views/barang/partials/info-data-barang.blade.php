@@ -35,7 +35,7 @@
             <td>{{ \Carbon\Carbon::parse($barang->tanggal_pengadaan)->translatedFormat('d F Y') }}</td>
         </tr>
         <tr>
-<<<<<<< HEAD
+
             <th>Sumber Barang</th>
             <td>
                 @if($barang->sumber_barang)
@@ -64,8 +64,8 @@
             </td>
         </tr>
         <tr>
-=======
->>>>>>> 7128ee3caecc07cd0adb1d836df3fe5b20ca7d83
+
+
             <th>Terakhir Diperbarui</th>
             <td>{{ \Carbon\Carbon::parse($barang->updated_at)->translatedFormat('d F Y, H:i') }}</td>
         </tr>

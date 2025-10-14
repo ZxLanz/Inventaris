@@ -1,4 +1,4 @@
-<<<<<<< HEAD
+
 {{-- resources/views/barang/_form.blade.php --}}
 
 <div class="row g-3">
@@ -55,7 +55,7 @@
                class="form-control @error('nama_barang') is-invalid @enderror" 
                value="{{ old('nama_barang', $barang->nama_barang ?? '') }}" 
                placeholder="Contoh: Laptop Asus ROG"
-=======
+
 <!-- File: resources/views/barang/partials/_form.blade.php -->
 
 <div class="row">
@@ -81,14 +81,14 @@
                id="nama_barang" 
                name="nama_barang" 
                value="{{ old('nama_barang', $barang->nama_barang ?? '') }}" 
->>>>>>> 7128ee3caecc07cd0adb1d836df3fe5b20ca7d83
+
                required>
         @error('nama_barang')
             <div class="invalid-feedback">{{ $message }}</div>
         @enderror
     </div>
 
-<<<<<<< HEAD
+
     {{-- Kategori --}}
     <div class="col-md-6">
         <label for="kategori_id" class="form-label">Kategori <span class="text-danger">*</span></label>
@@ -97,7 +97,7 @@
             @foreach($kategoris as $kategori)
                 <option value="{{ $kategori->id }}" 
                     {{ old('kategori_id', $barang->kategori_id ?? '') == $kategori->id ? 'selected' : '' }}>
-=======
+
     <!-- Kategori -->
     <div class="col-md-6 mb-3">
         <label for="kategori_id" class="form-label">Kategori</label>
@@ -109,7 +109,7 @@
             @foreach($kategoris as $kategori)
                 <option value="{{ $kategori->id }}" 
                         {{ old('kategori_id', $barang->kategori_id ?? '') == $kategori->id ? 'selected' : '' }}>
->>>>>>> 7128ee3caecc07cd0adb1d836df3fe5b20ca7d83
+
                     {{ $kategori->nama_kategori }}
                 </option>
             @endforeach
@@ -119,7 +119,7 @@
         @enderror
     </div>
 
-<<<<<<< HEAD
+
     {{-- Lokasi --}}
     <div class="col-md-6">
         <label for="lokasi_id" class="form-label">Lokasi <span class="text-danger">*</span></label>
@@ -128,7 +128,7 @@
             @foreach($lokasis as $lokasi)
                 <option value="{{ $lokasi->id }}" 
                     {{ old('lokasi_id', $barang->lokasi_id ?? '') == $lokasi->id ? 'selected' : '' }}>
-=======
+
     <!-- Lokasi -->
     <div class="col-md-6 mb-3">
         <label for="lokasi_id" class="form-label">Lokasi</label>
@@ -140,7 +140,7 @@
             @foreach($lokasis as $lokasi)
                 <option value="{{ $lokasi->id }}" 
                         {{ old('lokasi_id', $barang->lokasi_id ?? '') == $lokasi->id ? 'selected' : '' }}>
->>>>>>> 7128ee3caecc07cd0adb1d836df3fe5b20ca7d83
+
                     {{ $lokasi->nama_lokasi }}
                 </option>
             @endforeach
@@ -150,7 +150,7 @@
         @enderror
     </div>
 
-<<<<<<< HEAD
+
     {{-- Jumlah --}}
     <div class="col-md-6">
         <label for="jumlah" class="form-label">
@@ -163,7 +163,7 @@
                class="form-control @error('jumlah') is-invalid @enderror" 
                value="{{ old('jumlah', $barang->jumlah ?? 1) }}" 
                min="1" 
-=======
+
     <!-- Jumlah -->
     <div class="col-md-6 mb-3">
         <label for="jumlah" class="form-label">Jumlah</label>
@@ -173,12 +173,12 @@
                name="jumlah" 
                value="{{ old('jumlah', $barang->jumlah ?? '') }}" 
                min="0" 
->>>>>>> 7128ee3caecc07cd0adb1d836df3fe5b20ca7d83
+
                required>
         @error('jumlah')
             <div class="invalid-feedback">{{ $message }}</div>
         @enderror
-<<<<<<< HEAD
+
         <small class="text-muted" id="jumlah-hint">
             <i class="bi bi-info-circle"></i> 
             <span id="hint-asset" style="display: none;">
@@ -199,7 +199,7 @@
                class="form-control @error('satuan') is-invalid @enderror" 
                value="{{ old('satuan', $barang->satuan ?? 'Unit') }}" 
                placeholder="Contoh: Unit, Pcs, Buah"
-=======
+
     </div>
 
     <!-- Satuan -->
@@ -211,14 +211,14 @@
                name="satuan" 
                value="{{ old('satuan', $barang->satuan ?? '') }}" 
                placeholder="Unit, Pcs, Set, dll"
->>>>>>> 7128ee3caecc07cd0adb1d836df3fe5b20ca7d83
+
                required>
         @error('satuan')
             <div class="invalid-feedback">{{ $message }}</div>
         @enderror
     </div>
 
-<<<<<<< HEAD
+
     {{-- Kondisi - Hanya untuk Asset --}}
     <div class="col-md-6" id="kondisi-wrapper" style="display: none;">
         <label for="kondisi" class="form-label">Kondisi <span class="text-danger">*</span></label>
@@ -233,7 +233,7 @@
             <option value="Rusak Berat" {{ old('kondisi', $barang->kondisi ?? '') == 'Rusak Berat' ? 'selected' : '' }}>
                 Rusak Berat
             </option>
-=======
+
     <!-- Kondisi -->
     <div class="col-md-6 mb-3">
         <label for="kondisi" class="form-label">Kondisi</label>
@@ -248,14 +248,14 @@
                     {{ $kondisiOption }}
                 </option>
             @endforeach
->>>>>>> 7128ee3caecc07cd0adb1d836df3fe5b20ca7d83
+
         </select>
         @error('kondisi')
             <div class="invalid-feedback">{{ $message }}</div>
         @enderror
     </div>
 
-<<<<<<< HEAD
+
     {{-- Tanggal Pengadaan --}}
     <div class="col-md-6">
         <label for="tanggal_pengadaan" class="form-label">Tanggal Pengadaan <span class="text-danger">*</span></label>
@@ -264,7 +264,7 @@
                id="tanggal_pengadaan" 
                class="form-control @error('tanggal_pengadaan') is-invalid @enderror" 
                value="{{ old('tanggal_pengadaan', $barang->tanggal_pengadaan ?? date('Y-m-d')) }}" 
-=======
+
     <!-- Tanggal Pengadaan -->
     <div class="col-md-6 mb-3">
         <label for="tanggal_pengadaan" class="form-label">Tanggal Pengadaan</label>
@@ -273,14 +273,14 @@
                id="tanggal_pengadaan" 
                name="tanggal_pengadaan" 
                value="{{ old('tanggal_pengadaan', isset($barang) && $barang->tanggal_pengadaan ? $barang->tanggal_pengadaan->format('Y-m-d') : '') }}" 
->>>>>>> 7128ee3caecc07cd0adb1d836df3fe5b20ca7d83
+
                required>
         @error('tanggal_pengadaan')
             <div class="invalid-feedback">{{ $message }}</div>
         @enderror
     </div>
 
-<<<<<<< HEAD
+
     {{-- Sumber Barang --}}
     <div class="col-md-6">
         <label for="sumber_barang" class="form-label">Sumber Barang</label>
@@ -494,7 +494,7 @@ function previewImage(event) {
     border-radius: 8px;
 }
 </style>
-=======
+
     <!-- Gambar Barang -->
     <div class="col-12 mb-3">
         <label for="gambar" class="form-label">Gambar Barang</label>
@@ -516,4 +516,4 @@ function previewImage(event) {
 </x-primary-button>
 <x-tombol-kembali : href="{{ route('barang.index') }}" />
 </div>
->>>>>>> 7128ee3caecc07cd0adb1d836df3fe5b20ca7d83
+

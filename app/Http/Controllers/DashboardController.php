@@ -6,10 +6,10 @@ use App\Models\Barang;
 use App\Models\Kategori;
 use App\Models\Lokasi;
 use App\Models\User;
-<<<<<<< HEAD
+
 use App\Models\Peminjaman;
-=======
->>>>>>> 7128ee3caecc07cd0adb1d836df3fe5b20ca7d83
+
+
 use Illuminate\Http\Request;
 
 class DashboardController extends Controller
@@ -22,11 +22,11 @@ class DashboardController extends Controller
         $jumlahLokasi = Lokasi::count();
         $jumlahUser = User::count();
 
-<<<<<<< HEAD
+
         // Kondisi Barang
-=======
+
         // Kondisi Balik
->>>>>>> 7128ee3caecc07cd0adb1d836df3fe5b20ca7d83
+
         $kondisiBaik = Barang::where('kondisi', 'Baik')->count();
         $kondisiRusakRingan = Barang::where('kondisi', 'Rusak Ringan')->count();
         $kondisiRusakBerat = Barang::where('kondisi', 'Rusak Berat')->count();
@@ -34,7 +34,7 @@ class DashboardController extends Controller
         // Barang Terbaru
         $barangTerbaru = Barang::with(['kategori', 'lokasi'])->latest()->take(5)->get();
 
-<<<<<<< HEAD
+
         // === BARU: Statistik Peminjaman ===
         $totalPeminjaman = Peminjaman::count();
         $peminjamanAktif = Peminjaman::whereIn('status', ['Dipinjam', 'Terlambat'])->count();
@@ -47,8 +47,8 @@ class DashboardController extends Controller
             ->take(5)
             ->get();
 
-=======
->>>>>>> 7128ee3caecc07cd0adb1d836df3fe5b20ca7d83
+
+
         return view('dashboard', compact(
             'jumlahBarang',
             'jumlahKategori', 
@@ -57,17 +57,14 @@ class DashboardController extends Controller
             'kondisiBaik',
             'kondisiRusakRingan',
             'kondisiRusakBerat',
-<<<<<<< HEAD
             'barangTerbaru',
             // Peminjaman
             'totalPeminjaman',
             'peminjamanAktif',
             'peminjamanTerlambat',
             'menungguApproval',
-            'peminjamanTerbaru'
-=======
-            'barangTerbaru'
->>>>>>> 7128ee3caecc07cd0adb1d836df3fe5b20ca7d83
+            'peminjamanTerbaru',
+            'barangTerbaru',
         ));
     }
 }

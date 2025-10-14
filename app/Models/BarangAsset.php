@@ -18,7 +18,7 @@ class BarangAsset extends Model
         'tanggal_pengadaan' => 'date',
     ];
 
-    // ========== RELASI YANG SUDAH ADA ========== 
+    // === RELASI YANG SUDAH ADA === 
     
     public function barang(): BelongsTo
     {
@@ -30,7 +30,7 @@ class BarangAsset extends Model
         return $this->belongsTo(Lokasi::class, 'lokasi_id');
     }
 
-    // ========== 🆕 RELASI BARU - TAMBAHKAN INI ========== 
+    // === 🆕 RELASI BARU - TAMBAHKAN INI === 
     
     /**
      * Relationship: Asset belongs to Peminjaman (peminjaman aktif)
@@ -40,7 +40,7 @@ class BarangAsset extends Model
         return $this->belongsTo(Peminjaman::class, 'peminjaman_id');
     }
 
-    // ========== ACCESSOR (TETAP SAMA) ========== 
+    // === ACCESSOR (TETAP SAMA) === 
     
     public function getIsTersediaAttribute(): bool
     {

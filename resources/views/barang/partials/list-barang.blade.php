@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 {{-- resources/views/barang/partials/list-barang.blade.php --}}
 
 <div class="table-responsive">
@@ -235,7 +234,6 @@
                                                         </td>
                                                         <td class="text-center">
                                                             <div class="btn-group btn-group-sm" role="group">
-                                                                {{-- Tombol Detail --}}
                                                                 <button class="btn btn-info" 
                                                                         data-bs-toggle="modal" 
                                                                         data-bs-target="#assetModal{{ $asset->id }}"
@@ -243,14 +241,12 @@
                                                                     <i class="bi bi-eye"></i>
                                                                 </button>
                                                                 
-                                                                {{-- Tombol Edit --}}
                                                                 <a href="{{ route('barang-asset.edit', $asset->id) }}" 
                                                                    class="btn btn-warning" 
                                                                    title="Edit Asset">
                                                                     <i class="bi bi-pencil"></i>
                                                                 </a>
                                                                 
-                                                                {{-- Tombol Hapus --}}
                                                                 @if($asset->status != 'dipinjam')
                                                                     <form action="{{ route('barang-asset.destroy', $asset->id) }}" 
                                                                           method="POST" 
@@ -448,23 +444,19 @@
 @endif
 
 <style>
-/* Collapse animation */
 .collapse {
     transition: height 0.35s ease;
 }
 
-/* Table hover effect */
 .table-hover tbody tr:hover {
     background-color: #f8f9fa;
 }
 
-/* Badge styling */
 .badge {
     padding: 0.35em 0.65em;
     font-size: 0.85em;
 }
 
-/* Nested table styling */
 .collapse .table {
     background-color: white;
     margin-bottom: 0;
@@ -475,7 +467,6 @@
     color: white !important;
 }
 
-/* Button group */
 .btn-group .btn {
     border-radius: 0;
 }
@@ -490,12 +481,10 @@
     border-bottom-right-radius: 0.25rem;
 }
 
-/* Icon alignment */
 .bi {
     vertical-align: middle;
 }
 
-/* Chevron rotation animation */
 [data-bs-toggle="collapse"] i.bi-chevron-down {
     transition: transform 0.3s ease;
 }
@@ -504,20 +493,13 @@
     transform: rotate(180deg);
 }
 
-/* Summary box */
 .bg-white.rounded.border {
     box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-}
-
-/* Remove border from collapse row */
-.collapse-row {
-    border: none !important;
 }
 </style>
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Handle collapse toggle
     const collapseButtons = document.querySelectorAll('[data-bs-toggle="collapse"]');
     
     collapseButtons.forEach(button => {
@@ -536,84 +518,3 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 </script>
-=======
-{{-- File: resources/views/barang/partials/list-barang.blade.php --}}
-
-<div class="card">
-    <div class="card-body p-0">
-        <div class="table-responsive">
-            <table class="table table-hover mb-0">
-                <thead class="table-light">
-                    <tr>
-                        <th>No</th>
-                        <th>Kode</th>
-                        <th>Nama Barang</th>
-                        <th>Kategori</th>
-                        <th>Lokasi</th>
-                        <th>Jumlah</th>
-                        <th>Kondisi</th>
-                        <th>Aksi</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @forelse ($barangs as $index => $barang)
-                    <tr>
-                        <td>{{ $barangs->firstItem() + $index }}</td>
-                        <td>{{ $barang->kode_barang }}</td>
-                        <td>{{ $barang->nama_barang }}</td>
-                        <td>{{ $barang->kategori->nama_kategori ?? '-' }}</td>
-                        <td>{{ $barang->lokasi->nama_lokasi ?? '-' }}</td>
-                        <td>{{ $barang->jumlah }} {{ $barang->satuan }}</td>
-                        <td>
-                            @if($barang->kondisi == 'Baik')
-                                <span class="badge bg-success">{{ $barang->kondisi }}</span>
-                            @elseif($barang->kondisi == 'Rusak Ringan')
-                                <span class="badge bg-warning text-dark">{{ $barang->kondisi }}</span>
-                            @else
-                                <span class="badge bg-danger">{{ $barang->kondisi }}</span>
-                            @endif
-                        </td>
-                        <td>
-                            <div class="btn-group btn-group-sm" role="group">
-                                <!-- Tombol Lihat Detail -->
-                                <a href="{{ route('barang.show', $barang->id) }}" 
-                                   class="btn btn-info btn-sm" 
-                                   title="Lihat Detail">
-                                    <i class="bi bi-eye"></i>
-                                </a>
-                                
-                                <!-- Tombol Edit -->
-                                <a href="{{ route('barang.edit', $barang->id) }}" 
-                                   class="btn btn-warning btn-sm" 
-                                   title="Edit">
-                                    <i class="bi bi-pencil-square"></i>
-                                </a>
-                                
-                                <!-- Tombol Hapus -->
-                                <button type="button" 
-                                        class="btn btn-danger btn-sm" 
-                                        title="Hapus"
-                                        data-bs-toggle="modal" 
-                                        data-bs-target="#deleteModal"
-                                        data-url="{{ route('barang.destroy', $barang->id) }}">
-                                    <i class="bi bi-trash"></i>
-                                </button>
-                            </div>
-                        </td>
-                    </tr>
-                    @empty
-                    <tr>
-                        <td colspan="8" class="text-center text-muted">
-                            <div class="py-4">
-                                <i class="bi bi-box-seam fa-3x mb-3"></i>
-                                <p class="mb-0">Tidak ada data barang ditemukan</p>
-                            </div>
-                        </td>
-                    </tr>
-                    @endforelse
-                </tbody>
-            </table>
-        </div>
-    </div>
-</div>
->>>>>>> 7128ee3caecc07cd0adb1d836df3fe5b20ca7d83

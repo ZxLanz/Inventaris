@@ -1,7 +1,5 @@
-<<<<<<< HEAD
 {{-- Baris 1: Card Utama (Barang, Kategori, Lokasi, User) --}}
-=======
->>>>>>> 7128ee3caecc07cd0adb1d836df3fe5b20ca7d83
+
 <div class="row">
     @php
         $kartu = [
@@ -37,15 +35,9 @@
         ];
     @endphp
 
-<<<<<<< HEAD
     @foreach ($kartu as $item)
         @php
             extract($item);
-=======
-    @foreach ($kartu as $kartu)
-        @php
-            extract($kartu);
->>>>>>> 7128ee3caecc07cd0adb1d836df3fe5b20ca7d83
         @endphp
 
         @isset($role)
@@ -57,7 +49,6 @@
         @endisset
     @endforeach
 </div>
-<<<<<<< HEAD
 
 {{-- Baris 2: Card Peminjaman (Baris Terpisah) --}}
 <div class="row mt-4">
@@ -145,5 +136,3 @@
         </div>
     </div>
 </div>
-=======
->>>>>>> 7128ee3caecc07cd0adb1d836df3fe5b20ca7d83
