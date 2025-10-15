@@ -10,120 +10,6 @@ use Illuminate\Support\Facades\DB;
 class BarangAssetController extends Controller
 {
     /**
-     * Hapus individual asset unit
-     * 
-     * @param BarangAsset $barangAsset
-     * @return \Illuminate\Http\RedirectResponse
-     */
-    public function destroy(BarangAsset $barangAsset)
-    {
-        try {
-            Log::info('Attempting to delete barang asset', [
-                'id' => $barangAsset->id,
-                'kode_asset' => $barangAsset->kode_asset,
-                'status' => $barangAsset->status
-            ]);
-
-            // CEK: Apakah asset sedang dipinjam?
-            if ($barangAsset->status == 'dipinjam') {
-                return redirect()->route('barang.index')
-                    ->with('error', "Tidak dapat menghapus asset {$barangAsset->kode_asset}. Asset ini sedang dipinjam.");
-            }
-
-            DB::beginTransaction();
-
-            $kodeAsset = $barangAsset->kode_asset;
-            $namaBarang = $barangAsset->barang->nama_barang;
-            $barangId = $barangAsset->barang_id;
-
-            // Hapus gambar jika ada dan berbeda dengan gambar master
-            if ($barangAsset->gambar && $barangAsset->gambar != $barangAsset->barang->gambar) {
-                $imagePath = public_path('gambar-barang/' . $barangAsset->gambar);
-                if (file_exists($imagePath)) {
-                    unlink($imagePath);
-                    Log::info('Deleted asset image: ' . $barangAsset->gambar);
-                }
-            }
-
-            // Hapus asset
-            $barangAsset->delete();
-
-            // Update jumlah di barang master
-            $barang = \App\Models\Barang::find($barangId);
-            if ($barang) {
-                $barang->jumlah = $barang->assets()->count();
-                $barang->save();
-            }
-
-            DB::commit();
-
-            Log::info('Successfully deleted barang asset with ID: ' . $barangAsset->id);
-
-            return redirect()->route('barang.index')
-                ->with('success', "Asset {$kodeAsset} ({$namaBarang}) berhasil dihapus.");
-
-        } catch (\Exception $e) {
-            DB::rollBack();
-
-            Log::error('Error deleting barang asset', [
-                'id' => $barangAsset->id ?? 'unknown',
-                'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString()
-            ]);
-
-            return redirect()->route('barang.index')
-                ->with('error', 'Gagal menghapus asset: ' . $e->getMessage());
-        }
-    }
-
-    /**
-     * Update status asset (tersedia, dipinjam, maintenance, rusak)
-     * 
-     * @param Request $request
-     * @param BarangAsset $barangAsset
-     * @return \Illuminate\Http\JsonResponse
-     */
-    public function updateStatus(Request $request, BarangAsset $barangAsset)
-    {
-        try {
-            $validated = $request->validate([
-                'status' => 'required|in:tersedia,dipinjam,maintenance,rusak',
-            ]);
-
-            $oldStatus = $barangAsset->status;
-            $barangAsset->status = $validated['status'];
-            $barangAsset->save();
-
-            Log::info('Updated barang asset status', [
-                'id' => $barangAsset->id,
-                'kode_asset' => $barangAsset->kode_asset,
-                'old_status' => $oldStatus,
-                'new_status' => $validated['status']
-            ]);
-
-            return response()->json([
-                'success' => true,
-                'message' => "Status asset {$barangAsset->kode_asset} berhasil diubah menjadi {$validated['status']}",
-                'data' => [
-                    'status' => $barangAsset->status,
-                    'kode_asset' => $barangAsset->kode_asset
-                ]
-            ]);
-
-        } catch (\Exception $e) {
-            Log::error('Error updating barang asset status', [
-                'id' => $barangAsset->id ?? 'unknown',
-                'error' => $e->getMessage()
-            ]);
-
-            return response()->json([
-                'success' => false,
-                'message' => 'Gagal mengubah status: ' . $e->getMessage()
-            ], 500);
-        }
-    }
-
-    /**
      * Show detail asset
      * 
      * @param BarangAsset $barangAsset
@@ -131,7 +17,14 @@ class BarangAssetController extends Controller
      */
     public function show(BarangAsset $barangAsset)
     {
-        $barangAsset->load(['barang.kategori', 'lokasi']);
+        // Eager load semua relasi yang dibutuhkan
+        $barangAsset->load([
+            'barang.kategori',
+            'lokasi',
+            'maintenanceRecords' => function($query) {
+                $query->latest('tanggal_mulai');
+            }
+        ]);
         
         return view('barang-asset.show', compact('barangAsset'));
     }
@@ -225,6 +118,126 @@ class BarangAssetController extends Controller
 
             return back()->withErrors(['error' => 'Gagal memperbarui asset: ' . $e->getMessage()])
                 ->withInput();
+        }
+    }
+
+    /**
+     * Update status asset (tersedia, dipinjam, maintenance, rusak)
+     * 
+     * @param Request $request
+     * @param BarangAsset $barangAsset
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function updateStatus(Request $request, BarangAsset $barangAsset)
+    {
+        try {
+            $validated = $request->validate([
+                'status' => 'required|in:tersedia,dipinjam,maintenance,rusak',
+            ]);
+
+            $oldStatus = $barangAsset->status;
+            $barangAsset->status = $validated['status'];
+            $barangAsset->save();
+
+            Log::info('Updated barang asset status', [
+                'id' => $barangAsset->id,
+                'kode_asset' => $barangAsset->kode_asset,
+                'old_status' => $oldStatus,
+                'new_status' => $validated['status']
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => "Status asset {$barangAsset->kode_asset} berhasil diubah menjadi {$validated['status']}",
+                'data' => [
+                    'status' => $barangAsset->status,
+                    'kode_asset' => $barangAsset->kode_asset
+                ]
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('Error updating barang asset status', [
+                'id' => $barangAsset->id ?? 'unknown',
+                'error' => $e->getMessage()
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal mengubah status: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Hapus individual asset unit
+     * 
+     * @param BarangAsset $barangAsset
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function destroy(BarangAsset $barangAsset)
+    {
+        try {
+            Log::info('Attempting to delete barang asset', [
+                'id' => $barangAsset->id,
+                'kode_asset' => $barangAsset->kode_asset,
+                'status' => $barangAsset->status
+            ]);
+
+            // CEK: Apakah asset sedang dipinjam?
+            if ($barangAsset->status == 'dipinjam') {
+                return redirect()->route('barang.index')
+                    ->with('error', "Tidak dapat menghapus asset {$barangAsset->kode_asset}. Asset ini sedang dipinjam.");
+            }
+
+            // CEK: Apakah asset sedang maintenance?
+            if ($barangAsset->status == 'maintenance') {
+                return redirect()->route('barang.index')
+                    ->with('error', "Tidak dapat menghapus asset {$barangAsset->kode_asset}. Asset ini sedang dalam maintenance.");
+            }
+
+            DB::beginTransaction();
+
+            $kodeAsset = $barangAsset->kode_asset;
+            $namaBarang = $barangAsset->barang->nama_barang;
+            $barangId = $barangAsset->barang_id;
+
+            // Hapus gambar jika ada dan berbeda dengan gambar master
+            if ($barangAsset->gambar && $barangAsset->gambar != $barangAsset->barang->gambar) {
+                $imagePath = public_path('gambar-barang/' . $barangAsset->gambar);
+                if (file_exists($imagePath)) {
+                    unlink($imagePath);
+                    Log::info('Deleted asset image: ' . $barangAsset->gambar);
+                }
+            }
+
+            // Hapus asset
+            $barangAsset->delete();
+
+            // Update jumlah di barang master
+            $barang = \App\Models\Barang::find($barangId);
+            if ($barang) {
+                $barang->jumlah = $barang->assets()->count();
+                $barang->save();
+            }
+
+            DB::commit();
+
+            Log::info('Successfully deleted barang asset with ID: ' . $barangAsset->id);
+
+            return redirect()->route('barang.index')
+                ->with('success', "Asset {$kodeAsset} ({$namaBarang}) berhasil dihapus.");
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+
+            Log::error('Error deleting barang asset', [
+                'id' => $barangAsset->id ?? 'unknown',
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+
+            return redirect()->route('barang.index')
+                ->with('error', 'Gagal menghapus asset: ' . $e->getMessage());
         }
     }
 }

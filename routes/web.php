@@ -8,6 +8,7 @@ use App\Http\Controllers\KategoriController;
 use App\Http\Controllers\LokasiController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\PeminjamanController;
+use App\Http\Controllers\MaintenanceController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -51,12 +52,17 @@ Route::middleware('auth')->group(function () {
     // API untuk fetch assets
     Route::get('/api/peminjaman/get-assets', [PeminjamanController::class, 'getAssetsByBarang'])->name('peminjaman.getAssets');
 
+    // 🆕 Maintenance routes (sebelum resource)
+    Route::post('/maintenance/{maintenance}/complete', [MaintenanceController::class, 'complete'])
+        ->name('maintenance.complete');
+
     // Resource routes
     Route::resource('user', UserController::class);
     Route::resource('kategori', KategoriController::class);
     Route::resource('lokasi', LokasiController::class);
     Route::resource('barang', BarangController::class);
     Route::resource('peminjaman', PeminjamanController::class)->except(['edit', 'update', 'destroy']);
+    Route::resource('maintenance', MaintenanceController::class); // 🆕 Maintenance resource routes
 });
 
 require __DIR__.'/auth.php';

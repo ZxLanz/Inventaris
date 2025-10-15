@@ -23,6 +23,7 @@
                     ['route' => 'lokasi.index', 'name' => 'Lokasi'],
                     ['route' => 'kategori.index', 'name' => 'Kategori'],
                     ['route' => 'peminjaman.index', 'name' => 'Peminjaman', 'permission' => 'view peminjaman'],
+                    ['route' => 'maintenance.index', 'name' => 'Maintenance'], // 🆕 Menu Maintenance
                     ['route' => 'user.index', 'name' => 'User', 'role' => 'admin'],
                 ];
                 @endphp
