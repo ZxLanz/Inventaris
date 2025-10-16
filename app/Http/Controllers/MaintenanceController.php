@@ -9,6 +9,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class MaintenanceController extends Controller
 {
@@ -20,17 +21,14 @@ class MaintenanceController extends Controller
         $query = MaintenanceRecord::with(['asset.barang', 'asset.lokasi', 'teknisi'])
             ->latest('tanggal_mulai');
 
-        // Filter by maintenance type
         if ($request->filled('maintenance_type')) {
             $query->where('maintenance_type', $request->maintenance_type);
         }
 
-        // Filter by status
         if ($request->filled('status')) {
             $query->where('status', $request->status);
         }
 
-        // Filter by date range
         if ($request->filled('tanggal_mulai')) {
             $query->whereDate('tanggal_mulai', '>=', $request->tanggal_mulai);
         }
@@ -38,7 +36,6 @@ class MaintenanceController extends Controller
             $query->whereDate('tanggal_selesai', '<=', $request->tanggal_selesai);
         }
 
-        // Search
         if ($request->filled('search')) {
             $search = $request->search;
             $query->where(function($q) use ($search) {
@@ -54,7 +51,6 @@ class MaintenanceController extends Controller
 
         $maintenances = $query->paginate(15)->withQueryString();
 
-        // Statistics for dashboard
         $stats = [
             'total' => MaintenanceRecord::count(),
             'in_progress' => MaintenanceRecord::where('status', 'in_progress')->count(),
@@ -70,7 +66,6 @@ class MaintenanceController extends Controller
      */
     public function create()
     {
-        // Get available assets and users
         $assets = BarangAsset::with(['barang', 'lokasi'])
             ->whereIn('status', ['tersedia', 'rusak'])
             ->get();
@@ -93,8 +88,6 @@ class MaintenanceController extends Controller
             'tanggal_mulai' => 'required|date',
             'masalah_ditemukan' => 'nullable|string',
             'foto_sebelum' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
-            
-            // Maintenance Items
             'items' => 'required|array|min:1',
             'items.*.nama_item' => 'required|string|max:255',
             'items.*.deskripsi' => 'nullable|string',
@@ -105,25 +98,22 @@ class MaintenanceController extends Controller
 
         DB::beginTransaction();
         try {
-            // Upload foto sebelum
             $fotoSebelum = null;
             if ($request->hasFile('foto_sebelum')) {
                 $fotoSebelum = $request->file('foto_sebelum')->store('maintenance', 'public');
             }
 
-            // Get teknisi name if teknisi_id is provided
             $teknisiNama = null;
             if (!empty($validated['teknisi_id'])) {
                 $teknisi = User::find($validated['teknisi_id']);
                 $teknisiNama = $teknisi ? $teknisi->name : null;
             }
 
-            // Create maintenance record
             $maintenance = MaintenanceRecord::create([
                 'barang_asset_id' => $validated['barang_asset_id'],
                 'maintenance_type' => $validated['maintenance_type'],
                 'teknisi_id' => $validated['teknisi_id'],
-                'teknisi_nama' => $teknisiNama, // 🆕 Auto-fill dari users.name
+                'teknisi_nama' => $teknisiNama,
                 'vendor_name' => $validated['vendor_name'],
                 'tanggal_mulai' => $validated['tanggal_mulai'],
                 'masalah_ditemukan' => $validated['masalah_ditemukan'],
@@ -132,7 +122,6 @@ class MaintenanceController extends Controller
                 'created_by' => auth()->id(),
             ]);
 
-            // Create maintenance items
             foreach ($validated['items'] as $itemData) {
                 $maintenance->items()->create([
                     'nama_item' => $itemData['nama_item'],
@@ -145,10 +134,8 @@ class MaintenanceController extends Controller
                 ]);
             }
 
-            // Recalculate total biaya
             $maintenance->recalculate();
 
-            // Update asset status to maintenance
             $asset = BarangAsset::find($validated['barang_asset_id']);
             $asset->update(['status' => 'maintenance']);
 
@@ -161,7 +148,6 @@ class MaintenanceController extends Controller
         } catch (\Exception $e) {
             DB::rollBack();
             
-            // Delete uploaded file if exists
             if ($fotoSebelum && Storage::disk('public')->exists($fotoSebelum)) {
                 Storage::disk('public')->delete($fotoSebelum);
             }
@@ -219,8 +205,6 @@ class MaintenanceController extends Controller
             'tanggal_mulai' => 'required|date',
             'masalah_ditemukan' => 'nullable|string',
             'foto_sebelum' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
-            
-            // Maintenance Items
             'items' => 'required|array|min:1',
             'items.*.id' => 'nullable|exists:maintenance_items,id',
             'items.*.nama_item' => 'required|string|max:255',
@@ -233,16 +217,13 @@ class MaintenanceController extends Controller
 
         DB::beginTransaction();
         try {
-            // Handle foto sebelum
             if ($request->hasFile('foto_sebelum')) {
-                // Delete old photo
                 if ($maintenance->foto_sebelum && Storage::disk('public')->exists($maintenance->foto_sebelum)) {
                     Storage::disk('public')->delete($maintenance->foto_sebelum);
                 }
                 $validated['foto_sebelum'] = $request->file('foto_sebelum')->store('maintenance', 'public');
             }
 
-            // Get teknisi name if teknisi_id is provided
             if (!empty($validated['teknisi_id'])) {
                 $teknisi = User::find($validated['teknisi_id']);
                 $validated['teknisi_nama'] = $teknisi ? $teknisi->name : null;
@@ -250,14 +231,11 @@ class MaintenanceController extends Controller
                 $validated['teknisi_nama'] = null;
             }
 
-            // Update maintenance record
             $maintenance->update($validated);
 
-            // Update or create items
             $existingItemIds = [];
             foreach ($validated['items'] as $itemData) {
                 if (isset($itemData['id'])) {
-                    // Update existing item
                     $item = MaintenanceItem::find($itemData['id']);
                     $item->update([
                         'nama_item' => $itemData['nama_item'],
@@ -270,7 +248,6 @@ class MaintenanceController extends Controller
                     ]);
                     $existingItemIds[] = $item->id;
                 } else {
-                    // Create new item
                     $newItem = $maintenance->items()->create([
                         'nama_item' => $itemData['nama_item'],
                         'deskripsi' => $itemData['deskripsi'] ?? null,
@@ -284,10 +261,7 @@ class MaintenanceController extends Controller
                 }
             }
 
-            // Delete items that are not in the request
             $maintenance->items()->whereNotIn('id', $existingItemIds)->delete();
-
-            // Recalculate total biaya
             $maintenance->recalculate();
 
             DB::commit();
@@ -318,13 +292,11 @@ class MaintenanceController extends Controller
 
         DB::beginTransaction();
         try {
-            // Upload foto sesudah
             $fotoSesudah = null;
             if ($request->hasFile('foto_sesudah')) {
                 $fotoSesudah = $request->file('foto_sesudah')->store('maintenance', 'public');
             }
 
-            // Update maintenance record
             $maintenance->update([
                 'tanggal_selesai' => $validated['tanggal_selesai'],
                 'hasil_maintenance' => $validated['hasil_maintenance'],
@@ -333,7 +305,6 @@ class MaintenanceController extends Controller
                 'status' => 'completed',
             ]);
 
-            // Update asset status back to available
             $asset = $maintenance->asset;
             $asset->update(['status' => 'tersedia']);
 
@@ -346,7 +317,6 @@ class MaintenanceController extends Controller
         } catch (\Exception $e) {
             DB::rollBack();
             
-            // Delete uploaded file if exists
             if ($fotoSesudah && Storage::disk('public')->exists($fotoSesudah)) {
                 Storage::disk('public')->delete($fotoSesudah);
             }
@@ -364,7 +334,6 @@ class MaintenanceController extends Controller
     {
         DB::beginTransaction();
         try {
-            // Delete photos
             if ($maintenance->foto_sebelum && Storage::disk('public')->exists($maintenance->foto_sebelum)) {
                 Storage::disk('public')->delete($maintenance->foto_sebelum);
             }
@@ -372,15 +341,11 @@ class MaintenanceController extends Controller
                 Storage::disk('public')->delete($maintenance->foto_sesudah);
             }
 
-            // Update asset status if still in maintenance
             if ($maintenance->status === 'in_progress') {
                 $maintenance->asset->update(['status' => 'tersedia']);
             }
 
-            // Delete items (cascade)
             $maintenance->items()->delete();
-
-            // Delete maintenance record
             $maintenance->delete();
 
             DB::commit();
@@ -393,5 +358,79 @@ class MaintenanceController extends Controller
             DB::rollBack();
             return back()->with('error', 'Gagal menghapus data: ' . $e->getMessage());
         }
+    }
+
+    /**
+     * Cetak Laporan Maintenance (PDF)
+     */
+    public function cetakLaporan(Request $request)
+    {
+        $query = MaintenanceRecord::with([
+            'asset.barang.kategori',
+            'asset.lokasi',
+            'teknisi',
+            'items'
+        ])->orderBy('tanggal_mulai', 'desc');
+
+        if ($request->filled('tanggal_mulai')) {
+            $query->whereDate('tanggal_mulai', '>=', $request->tanggal_mulai);
+        }
+
+        if ($request->filled('tanggal_selesai')) {
+            $query->whereDate('tanggal_mulai', '<=', $request->tanggal_selesai);
+        }
+
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+
+        if ($request->filled('maintenance_type')) {
+            $query->where('maintenance_type', $request->maintenance_type);
+        }
+
+        $maintenances = $query->get();
+
+        $stats = [
+            'total' => $maintenances->count(),
+            'total_biaya' => $maintenances->sum('total_biaya'),
+            'total_material' => $maintenances->sum('total_biaya_material'),
+            'total_jasa' => $maintenances->sum('total_biaya_jasa'),
+            'preventive_count' => $maintenances->where('maintenance_type', 'preventive')->count(),
+            'preventive_biaya' => $maintenances->where('maintenance_type', 'preventive')->sum('total_biaya'),
+            'corrective_count' => $maintenances->where('maintenance_type', 'corrective')->count(),
+            'corrective_biaya' => $maintenances->where('maintenance_type', 'corrective')->sum('total_biaya'),
+            'completed_count' => $maintenances->where('status', 'completed')->count(),
+            'completed_biaya' => $maintenances->where('status', 'completed')->sum('total_biaya'),
+            'in_progress_count' => $maintenances->where('status', 'in_progress')->count(),
+            'in_progress_biaya' => $maintenances->where('status', 'in_progress')->sum('total_biaya'),
+        ];
+
+        $title = 'Laporan Maintenance & Perbaikan Barang';
+        $date = now()->locale('id')->isoFormat('D MMMM YYYY, HH:mm') . ' WIB';
+        
+        $filterInfo = [];
+        if ($request->filled('tanggal_mulai') || $request->filled('tanggal_selesai')) {
+            $start = $request->tanggal_mulai ? \Carbon\Carbon::parse($request->tanggal_mulai)->locale('id')->isoFormat('D MMMM YYYY') : 'Awal';
+            $end = $request->tanggal_selesai ? \Carbon\Carbon::parse($request->tanggal_selesai)->locale('id')->isoFormat('D MMMM YYYY') : 'Akhir';
+            $filterInfo['periode'] = "Periode: {$start} - {$end}";
+        }
+        if ($request->filled('status')) {
+            $filterInfo['status'] = 'Status: ' . ($request->status == 'completed' ? 'Selesai' : 'Sedang Proses');
+        }
+        if ($request->filled('maintenance_type')) {
+            $filterInfo['tipe'] = 'Tipe: ' . ucfirst($request->maintenance_type);
+        }
+
+        $pdf = Pdf::loadView('maintenance.laporan', compact(
+            'maintenances',
+            'stats',
+            'title',
+            'date',
+            'filterInfo'
+        ));
+
+        $pdf->setPaper('a4', 'landscape');
+
+        return $pdf->stream('laporan-maintenance-' . date('Y-m-d') . '.pdf');
     }
 }

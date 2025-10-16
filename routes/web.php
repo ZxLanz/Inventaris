@@ -52,7 +52,8 @@ Route::middleware('auth')->group(function () {
     // API untuk fetch assets
     Route::get('/api/peminjaman/get-assets', [PeminjamanController::class, 'getAssetsByBarang'])->name('peminjaman.getAssets');
 
-    // 🆕 Maintenance routes (sebelum resource)
+    // 🆕 Maintenance routes (sebelum resource) - TAMBAHAN BARU
+    Route::get('/maintenance/laporan', [MaintenanceController::class, 'cetakLaporan'])->name('maintenance.laporan');
     Route::post('/maintenance/{maintenance}/complete', [MaintenanceController::class, 'complete'])
         ->name('maintenance.complete');
 
@@ -62,7 +63,7 @@ Route::middleware('auth')->group(function () {
     Route::resource('lokasi', LokasiController::class);
     Route::resource('barang', BarangController::class);
     Route::resource('peminjaman', PeminjamanController::class)->except(['edit', 'update', 'destroy']);
-    Route::resource('maintenance', MaintenanceController::class); // 🆕 Maintenance resource routes
+    Route::resource('maintenance', MaintenanceController::class);
 });
 
 require __DIR__.'/auth.php';

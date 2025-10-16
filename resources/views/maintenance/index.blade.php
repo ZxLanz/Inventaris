@@ -2,9 +2,15 @@
     <x-slot name="header">
         <div class="d-flex justify-content-between align-items-center">
             <h2 class="h4 mb-0">{{ __('Maintenance & Perbaikan') }}</h2>
-            <a href="{{ route('maintenance.create') }}" class="btn btn-primary">
-                <i class="bi bi-plus-circle me-1"></i> Tambah Maintenance
-            </a>
+            <div>
+                {{-- 🆕 Tombol Cetak Laporan --}}
+                <button type="button" class="btn btn-success me-2" data-bs-toggle="modal" data-bs-target="#laporanModal">
+                    <i class="bi bi-printer me-1"></i> Cetak Laporan
+                </button>
+                <a href="{{ route('maintenance.create') }}" class="btn btn-primary">
+                    <i class="bi bi-plus-circle me-1"></i> Tambah Maintenance
+                </a>
+            </div>
         </div>
     </x-slot>
 
@@ -294,6 +300,94 @@
                         </div>
                     @endif
                 </div>
+            </div>
+        </div>
+    </div>
+
+    {{-- 🆕 Modal Cetak Laporan --}}
+    <div class="modal fade" id="laporanModal" tabindex="-1" aria-labelledby="laporanModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form action="{{ route('maintenance.laporan') }}" method="GET" target="_blank">
+                    <div class="modal-header bg-success text-white">
+                        <h5 class="modal-title" id="laporanModalLabel">
+                            <i class="bi bi-printer me-2"></i>Cetak Laporan Maintenance
+                        </h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="alert alert-info">
+                            <i class="bi bi-info-circle me-2"></i>
+                            <strong>Pilih filter untuk laporan yang ingin dicetak.</strong><br>
+                            <small>Kosongkan untuk mencetak semua data.</small>
+                        </div>
+
+                        {{-- Filter Periode --}}
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">
+                                <i class="bi bi-calendar-range me-1"></i>Periode Tanggal
+                            </label>
+                            <div class="row g-2">
+                                <div class="col-6">
+                                    <label class="form-label small">Tanggal Mulai</label>
+                                    <input type="date" name="tanggal_mulai" class="form-control" 
+                                           value="{{ request('tanggal_mulai') }}">
+                                </div>
+                                <div class="col-6">
+                                    <label class="form-label small">Tanggal Selesai</label>
+                                    <input type="date" name="tanggal_selesai" class="form-control" 
+                                           value="{{ request('tanggal_selesai') }}">
+                                </div>
+                            </div>
+                            <small class="text-muted">Kosongkan untuk semua periode</small>
+                        </div>
+
+                        {{-- Filter Status --}}
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">
+                                <i class="bi bi-check-circle me-1"></i>Status Maintenance
+                            </label>
+                            <select name="status" class="form-select">
+                                <option value="">Semua Status</option>
+                                <option value="in_progress" {{ request('status') == 'in_progress' ? 'selected' : '' }}>
+                                    Sedang Proses
+                                </option>
+                                <option value="completed" {{ request('status') == 'completed' ? 'selected' : '' }}>
+                                    Selesai
+                                </option>
+                            </select>
+                        </div>
+
+                        {{-- Filter Tipe --}}
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">
+                                <i class="bi bi-tools me-1"></i>Tipe Maintenance
+                            </label>
+                            <select name="maintenance_type" class="form-select">
+                                <option value="">Semua Tipe</option>
+                                <option value="preventive" {{ request('maintenance_type') == 'preventive' ? 'selected' : '' }}>
+                                    Preventive (Pemeliharaan Rutin)
+                                </option>
+                                <option value="corrective" {{ request('maintenance_type') == 'corrective' ? 'selected' : '' }}>
+                                    Corrective (Perbaikan)
+                                </option>
+                            </select>
+                        </div>
+
+                        <div class="alert alert-warning mb-0">
+                            <i class="bi bi-exclamation-triangle me-2"></i>
+                            <small><strong>Catatan:</strong> Laporan akan dibuka di tab baru dalam format PDF.</small>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                            <i class="bi bi-x-circle me-1"></i>Batal
+                        </button>
+                        <button type="submit" class="btn btn-success">
+                            <i class="bi bi-printer me-1"></i>Cetak Laporan PDF
+                        </button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
